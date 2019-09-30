@@ -35,7 +35,7 @@
 - variety           #壁纸管理器
 - i3-gaps           #i3的边框效果
 - polybar           #好用的状态栏（配合i3，完美）
-
+- figlet            #打印漏洞字体
 
 
 
