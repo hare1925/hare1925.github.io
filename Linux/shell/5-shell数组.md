@@ -4,7 +4,7 @@
 与大部分语言类似，数组元素的下标由0开始。
 shell数组用括号来表示，元素用“空格”符号分隔开，语法格式如下：
 
-`arrar_name=(vauel ... valuen)
+`arrar_name=(vauel ... valuen)`
 
 **实例**
 
