@@ -1,5 +1,6 @@
 # Common software for Linux
 
+- deepin-screenshot     #深度截屏，与微信截屏类似，但是快捷方式需要自行设置
 - ark       #图形化压缩包管理器
 - deepin-file-manager   #文件管理器
 - libreoffice   #office办公软件
