@@ -1,5 +1,6 @@
 # Common software for Linux
 
+- ark       #图形化压缩包管理器
 - deepin-file-manager   #文件管理器
 - libreoffice   #office办公软件
 - manjaro   #好用的系统
