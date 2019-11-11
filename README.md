@@ -113,6 +113,9 @@
 
 https://baike.baidu.com/item/%E4%B8%9B%E6%9E%97%E6%B3%95%E5%88%99/3353?fr=aladdin
 
+## 邓宁克鲁认知曲线  
+
+![邓宁克鲁认知曲线](./DengNingKeLuRenZhiQuXian.jpg)  
 
 
 
