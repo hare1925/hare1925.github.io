@@ -574,9 +574,93 @@ FHS建议所有软件开发者，应该讲他们的资料合理的分别放置�
 | 目录 | 应放置档案内容 |
 | /usr/bin/ | 所有一般用户能够使用的指令都放在这里！目前新的CentOS 7已经将全部的使用者指令方盒子于此，而使用链接档的方式将 /bin 链接于此！也就是收， /usr/bin 与 /bin 是一模一样了！另外：FHS要求在此目录下不应该有子目录！ |
 | /usr/lib/ | 基本上，与 /lib 功能相同，所以 /lib 就是连接到此目录中的！ |
-| /usr/local | 系统管理员在本机自行安装自己下载的软件（非distribution预设提供者），建议安装到次目录，
+| /usr/local | 系统管理员在本机自行安装自己下载的软件（非distribution预设提供者），建议安装到次目录，这样会比较便于管理。距离来说，你的distribution提供的软件较旧，你想安装较新的软件但又不想移除旧版，此时你可以将新版软件安装于 /usr/local/ 目录下，可与原先的旧版软件有分别了。你可以自行到 /usr/local 去看看，该目录下也是具有 bin, etc,include, lib ..的次目录哦！ |
+| /usr/sbin | 非系统正常运作所需要的系统指令，最常见的就是某些网路服务器软件的服务指令（daemon）！不过基本功能与 /sbin 也差不多，因此目前 /sbin 就是连接到此目录中的。 |
+| /usr/share/ | 主要放置只读架构的资料档案，当然也包括共享文件。在这个目录下放置的资料几户是不分硬件架构均可读取的资料，因为几户都是文字档案嘛！在此目录下常见的还有这些次目录：<br>- /usr/share/man : 线上说明文件<br>- /usr/share/doc : 软件杂项的文件说明<br>- /usr/share/zoneinfo : 与时区有关的时区档案 |
+
+- 第二部分：FHS建议可以存在的目录  
+
+| 目录 | 应放置答案内容 |
+| /usr/games | 与游戏比较相关的资料放置处 |
+| /usr/include | c/c++等程序语言的档头（header）与包含档（include）放置处，档我们以tarball方式（\*.tar.gz的方式安装软件）安装某些资料时，会使用到里头的许多包含档哦！ |
+| /usr/libexec | 某些不被一般使用者惯用的执行档或脚本(script)等等，都会放置在次目录中。例如大部分的X视窗底下的操作指令，很多都是放在次目录下的。 |
+| /usr/lib<qual>/ | 与 /lib<qual>/工能相同，因此目前 /lib<qual> 就是链接到此目录中 |
+| /usr/src |一般原始码建议放置到这里，src有source的意思，至于核心原始码则建议放置到 /usr/src/linux/ 目录下。 |
+
+
+----
+
+- /var的意义与内容：  
+
+如果 /usr 是安装时会占用较大银盘容量的目录，那么/var就是在系统运作后才会渐渐占用硬盘容量的目录。因为 /var 目录主要针对常态性变动的档案，包括快取（cache）、登录档（log file）以及某些软件运作产生的档案，包括程序档案（lock file， run file），或者例如MySQL资料库的档案等等，常见的次目录有：  
+
+- 第一部分：FHS要求必须要存在目录  
+
+| 目录 | 应放置档案内容 |
+| /var/cache | 应用程序本身运作过程中会产生的一些暂存档： |
+| /var/lib/ | 程序本身执行的过程中，需要使用到的资料档案放置的目录。在此目录下各自的软件应该有各自的目录。例如：MySQL的资料库放置到 /var/lib/mysql/ 而 rpm 的资料库则放当 /var/lib/rpm去！ |
+| /var/lock/ | 某些装置或者是答案资源一次只能被一个应用程序锁使用，如果同时有两个程序使用该装置时，就可能产生一些错误的状况，因此就得要将该装置上锁（lock），以确保装置只会给单一软件所使用，例如：烧录机正在刻录一张光盘。会不会有两个人同时在使用一个烧录机烧片？如果两个人同时使用，那这个片子写入的资料是谁的？所以当第一个人在使用的时候烧录机就会被上锁，第二个人就要等该装置被接触锁定（就是前一个使用的人用完了）才能够继续使用，目前此目录也已经挪到 /run/lock 中！ |
+| /var/log/ | 重要到不行！这是登录档放置的目录！里面比较重要的档案如 /var/log/messages, /var/log/wtmp(记录登入者的咨询）等。 |
+| /var/mail | 放置一个电子邮件信箱的目录，不过这个目录也被放置到 /var/spool/mail/ 目录中!通常这两个目录是互为链接档啦！ |
+| /var/run/ | 某些程序或是服务启动后，会将他们的PID放置在这个目录下！至于PID的意义我们后面再学。与 /run 相同，这个目录链接到 /run 去了！ |
+| /var/spool/ | 这个目录通常放置一些伫（同单人一个宁字）列资料，所谓的【伫列】就是排队等地啊其他程序使用的资料了。这些资料别使用后通常都会被删除。例如：系统收到新信会放置到 /var/spool/mail/ 中，但使用者手下该信件后该封信原则上就会被删除。信件如果暂时寄送不出去会被放到 /var/spool/mqueue/ 中，等到被送出后就会被删除，如果是工作排程资料(crontab)，就会被放置到 /var/spool/cron/ 目录中。 |
+
+-----
+
+- 针对FHS、各家distribution的一同与CentOS 7 的变化  
+
+由于FHS仅定义出最上层（/）及次层（/usr, /var）的目录内容应该要放置的档案或目录资料，因此，在其他次目录层级内，就可以岁开发者自行来配置了，例如：CentOS的网路设定资料放在 /etc/systemconfig/network-scripts/ 目录下，但是SUSE则是将网路放置在 /etc/sysconfig/network/ 目录下，目录名称不同，不过只要记住大致的FHS标准，插旗性其实有限啦！  
+
+此外，CentOS 7 在目录的编排上与过去的版本不同，比较大的差异在于将许多原本应该要在根目录（/）里面的目录，将它内部资料全部都挪到 /usr 里面去，然后进行链接设定！包括如下这些：  
+
+- /bin --> /usr/bin
+- /sbin --> /usr/sbin
+- /lib --> /usr/lib  
+- /lib64 --> /usr/lib64  
+- /var/lock --> /run/lock  
+- /var/run --> /run  
+
 
 ### 3.2、目录树(directory tree)
+
+在Linux下，所有档案目录都是由根目录开始的。那是所有目录与档案的源头，然后在一个分支下来，有点像树枝状一样，因此，我们也成这种目录配置方式为：【目录树（directory tree）】。  
+
+目录树的特性主要有：  
+
+- 目录树的启动点为根目录（/, root）;  
+- 每一个目录不止能使用本地端的partition的档案系统，也可以使用网路上的filesystem。例如：可以利用Network File System（NFS）伺服器挂在某个特定目录等。  
+- 每一个档案在此目录树中的档名（包含完整路径）都是独一无二的。  
+
+谈完FHS标准后，实际看看CentOS在跟底下会有什么样子的资料：
+
+```
+[dmtsai@study ~]$ ls -l /
+lrwxrwxrwx.   1 root root    7 May  4 17:51 bin -> usr/bin
+dr-xr-xr-x.   4 root root 4096 May  4 17:59 boot
+drwxr-xr-x.  20 root root 3260 Jun  2 19:27 dev
+drwxr-xr-x. 131 root root 8192 Jun  2 23:51 etc
+drwxr-xr-x.   3 root root   19 May  4 17:56 home
+lrwxrwxrwx.   1 root root    7 May  4 17:51 lib -> usr/lib
+lrwxrwxrwx.   1 root root    9 May  4 17:51 lib64 -> usr/lib64
+drwxr-xr-x.   2 root root    6 Jun 10  2014 media
+drwxr-xr-x.   2 root root    6 Jun 10  2014 mnt
+drwxr-xr-x.   3 root root   15 May  4 17:54 opt
+dr-xr-xr-x. 154 root root    0 Jun  2 11:27 proc
+dr-xr-x---.   5 root root 4096 Jun  3 00:04 root
+drwxr-xr-x.  33 root root  960 Jun  2 19:27 run
+lrwxrwxrwx.   1 root root    8 May  4 17:51 sbin -> usr/sbin
+drwxr-xr-x.   2 root root    6 Jun 10  2014 srv
+dr-xr-xr-x.  13 root root    0 Jun  2 19:27 sys
+drwxrwxrwt.  12 root root 4096 Jun  3 19:48 tmp
+drwxr-xr-x.  13 root root 4096 May  4 17:51 usr
+drwxr-xr-x.  22 root root 4096 Jun  2 19:27 var
+```
+
+以上目录相关的介绍都爱上一小节，如果以图示的方案来显示，有点像这样：  
+
+![目录树](0x5-1.jpg)
+
+了解完FHS标准后，在去看看安装linux规划的分隔情况，根据FHs的定义，最好能够将 /var 独立出来，这样对于系统的资料还有一些安全性的保护呢，因为至少 /var 死掉时，你的根目录还活着呢，能够进入救援模式嘛！  
 
 ### 3.3、绝对路径与相对路径
 
