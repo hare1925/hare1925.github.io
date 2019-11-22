@@ -664,27 +664,94 @@ drwxr-xr-x.  22 root root 4096 Jun  2 19:27 var
 
 ### 3.3、绝对路径与相对路径
 
+除了需要特别注意的FHS目录配置外，在档名部分我们也要特别注意!因为根据档名的写法不同，也可将所谓的路径(path)定义为绝对路径(absolute)与相对路径(relative)。这两种档名/路径的写法依据是：  
+
+- **绝对路径**：由根目录(/)开始写起的档名或目录名称，例如：/home/hare/text.txt;  
+- **相对路径**：相对于目前路径的档名写法。例如： ./hame/hare 或 ../../home/hare 等等，反正开头不是 / 就属于相对路径的写法。  
+
+必须要了解，相对路径是以【当前所在路径的相对位置】来表示的。距离来说，你当前在 /home 这个目录下，如果想要进入 /var/log 这个目录时，可以怎么写呢？
+
+1. cd /var/log (absolute)绝对路径  
+2. cd ../var/log (relative)相对路径  
+
+因为在 /home 底下，所以要回到上一层（../）之后，才能继续往 /var 来移动！特别注意这两个特殊的目录：  
+
+- `.`：代表当前的目录，也可以使用`./`来表示；  
+- `..`：代表上一层目录，亦可以使用 `../` 来表示。  
+
 
 ### 3.4、CentOS的观察：lsb_release
 
+Linux distribution 的差异性，除了FHS外，还有个 Linux Standard Base（LSB）的标准是可以依循的！我们可以简单的使用ls来查看FHS柜面的目录是否正确的存在于你的Linux系统中，那么Linux核心，LSB的标准又该如何查阅呢？基本上，LSB团队是有列出正确支援LSB标准的 distribution 在如下的网页中：  
 
+- https://www.linuxbase.org/lsb-cert/productdir.php?by_lsb  
 
+如果想要知道确切的核心LSB所需要求的几种重要标准的话，恐怕得需要使用如 uname 与 lsb_release 等指令来查阅了。不过，这个 lsb_release 指令已经不是预设安装的软件了，所以得要自己安装该软件才行。
 
+```
+# 1. 透過 uname 檢查 Linux 核心與作業系統的位元版本
+[dmtsai@study ~]$ uname -r   # 查看核心版本
+3.10.0-229.el7.x86_64
+[dmtsai@study ~]$ uname -m   # 查看作業系統的位元版本
+x86_64
+
+# 2. 假設你的 CentOS 7 確實有網路可以使用的情況下 (要用 root 的身份)
+[root@study ~]# yum install redhat-lsb   # yum 的用法後面章節才會介紹
+.....(前面省略)....
+Install  1 Package  (+85 Dependent packages)
+Upgrade             (  4 Dependent packages)
+
+Total size: 47 M
+Total download size: 31 M
+Is this ok [y/d/N]: y
+.....(後面省略)....
+Retrieving key from file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+Importing GPG key 0xF4A80EB5:
+ Userid     : "CentOS-7 Key (CentOS 7 Official Signing Key) <security@centos.org>"
+ Fingerprint: 6341 ab27 53d7 8a78 a7c2 7bb1 24c6 a8a7 f4a8 0eb5
+ Package    : centos-release-7-0.1406.el7.centos.2.3.x86_64 (@anaconda)
+ From       : /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+Is this ok [y/N]: y
+.....(後面省略)....
+
+[root@study ~]# lsb_release -a
+LSB Version:    :core-4.1-amd64:core-4.1-noarch:cxx-4.1-amd64:cxx-4.1-noarch:
+desktop-4.1-amd64:desktop-4.1-noarch:languages-4.1-amd64:languages-4.1-noarch:
+printing-4.1-amd64:printing-4.1-noarch  # LSB 的相關版本
+Distributor ID: CentOS
+Description:    CentOS Linux release 7.0.1406 (Core)
+Release:        7.0.1406
+Codename:       Core
+```
+
+这个 lsb_release 的东西先看看就好，后面设计到 yum 软件安装的东西，后面再学。  
 
 ----
 
 ## 4、重点回顾
 
-
-
-
-
-
-
-
-
-
-
+- Linux的每个档案中，可分别给予拥有者、群组与其他人三种身份个别的 rwx 权限；  
+- 群组最有用的功能之一，就是当你在团队开发资源的时候，且每个账号都可以有多个群组的支援；  
+- 利用 ls -l 显示的答案属性中，第一个栏位是档案的权限，共有10个字节，第一个字节是答案类型，接下来三个为一组共三组，为拥有者、群组、其他人的权限，权限有 r，w，x三种；  
+- 如果档名之前多一个【.】，则代表这个档案为【隐藏档】。  
+- 若需要root的权限时，可以使用 su- 这个指令来切换身份，处理完毕则使用 exit 离开 su 的指令环境。  
+- 更改档案的群组支持可用 chgrp，修改档案的拥有者可用 chown，修改答案的权限可用 chmod；  
+- chmod修改权限的方法有两种，分别是符号法与数字法，数字法中 r, w, x分数为 4, 2, 1 ;  
+- 对档案来讲，权限的效能为：  
+	- r : 可读取此一档案的市级内容，如读取文字档的文字内容等；  
+	- w : 可以编辑、新增或修改档案的内容（但不含删除该档案）；
+	- x : 该档案具有可以被系统执行的权限。  
+- 对目录来说，权限的效能为：  
+	- r : (read contents in directory）;  
+	- w : (modify contents of directory);
+	- x : (access directory).  
+- 要开放目录给任何人浏览时，应该至少也要给与r及x的权限，但是w权限不可随便给的；  
+- 能否读取到某个答案内容，跟该档案所在的目录权限也有关系（目录至少需要有x的权限）；  
+- Linux档名的限制为：单一档案或目录的最大容许档名为 255 个英文字节或 128 个中文字；  
+- 根据FHS的官方文件指出，他们的主要目的是希望让使用者可以了解到已安装软件通常放置于那个目录下；  
+- FHS订定出来了四种目录特色：shareable, unshareable, static, variable等四类；  
+- FHS所定义的三层主目录为： `/, /var, /usr`三层而已；  
+- 绝对路径档名为从根目录 / 开始写起，否则都是先谷底路径的档名。
 
 
 
