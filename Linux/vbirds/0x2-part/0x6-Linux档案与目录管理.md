@@ -141,9 +141,62 @@ drwx--x--x. 2 root   root  6 Jun  4 19:05 test2
 # 那麼你的預設屬性為何？這要透過底下介紹的 umask 才能瞭解喔！ ^_^
 ```
 
+如果想要建立新的目录的化，那么就使用mkdir（make directory）吧！不过，在预设的情况下，你需要的目录得一层一层的建立才行！  
+不过，现在有个更简单有效的方法！那就是加上`-p`这个选项哦！这个会递归穿件，并且，如果该目录本来就已经存在时，系统也不会显示错误信息哦！（不过鸟哥不建议使用-p因为如果打错字，目录就会乱七八糟的。  
+另外，还有个地方必须要现有概念，那就是【预设权限】的地方。我们可以利用 -m 来强制给予一个新的目录相关的权限，例如上表当中，我们给予了 -m 711来给予新的目录 drwx--x--x 的权限。不过，如果没有给予 -m 选项时，那么预设的新建目录权限又是什么呢？这个和umask有关，我们在本章后头会介绍的。  
 
+--------
+
+- rmdir(删除【空】的目录)  
+
+```
+[root@study ~]# rmdir [-p] 目錄名稱
+選項與參數：
+-p ：連同『上層』『空的』目錄也一起刪除
+
+範例：將於mkdir範例中建立的目錄(/tmp底下)刪除掉！
+[root@study tmp]# ls -ld test*   <==看看有多少目錄存在？
+drwxr-xr-x. 2 root   root  6 Jun  4 19:03 test
+drwxr-xr-x. 3 root   root 18 Jun  4 19:04 test1
+drwx--x--x. 2 root   root  6 Jun  4 19:05 test2
+[root@study tmp]# rmdir test   <==可直接刪除掉，沒問題
+[root@study tmp]# rmdir test1  <==因為尚有內容，所以無法刪除！
+rmdir: failed to remove ‘test1’: Directory not empty
+[root@study tmp]# rmdir -p test1/test2/test3/test4
+[root@study tmp]# ls -ld test*    <==您看看，底下的輸出中test與test1不見了！
+drwx--x--x. 2 root   root  6 Jun  4 19:05 test2
+# 瞧！利用 -p 這個選項，立刻就可以將 test1/test2/test3/test4 一次刪除～
+# 不過要注意的是，這個 rmdir 僅能『刪除空的目錄』喔！
+```
+
+如果有想要深处的目录，就使用 rmdir 吧！  
+注意，目录需要一层一层的产出才行！而且被删除的目录里面必定不能存在其他的目录或档案！这意识所谓的空目录（empty directory)的意思啊！  
+如果要将所有目录下的东西都删除掉！这个时候就必须要使用【rm -r】来进行递归删除了，不过还是使用rmdir比较不危险，也可以尝试使用 -p 的选项加入，来删除上层的目录哦！
 
 ### 1.3、关于执行文件路径的变量：$PATH
+
+经过前面FHS的学习，我们可以知道查阅档案属性的指令ls完整大难名为： /bin/ls（这是绝对路径），那为什么我可以在任何地方执行 /bin/ls 这个指令呢？  
+为什么我在任何目录下输入 ls 就一定可以显示出一些信息而不会说找不到该 /bin/ls 指令呢？  
+这是因为环境变量 PATH 的帮助所致。  
+
+**当我们在执行一个指令的时候，例如 ls这个命令，系统会依照PATH的设定去每个PATH定义的目录下搜寻档名为 ls 的可执行文档，如果PATH定义的目录中含有多个档名为ls的可执行档，那么先搜索到的同名指令先被执行。**  
+
+现在，可以下达【echo $PATH】来看看到底有那些目录被定义出来了？ echo有【显示、打印】的意思，而PATH前面加的 $ 表示后面节的是变数，所以会显示出目前的PATH  
+
+```
+範例：先用root的身份列出搜尋的路徑為何？
+[root@study ~]# echo $PATH
+/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+
+範例：用dmtsai的身份列出搜尋的路徑為何？
+[root@study ~]# exit    # 由之前的 su - 離開，變回原本的帳號！或再取得一個終端機皆可！
+[dmtsai@study ~]$ echo $PATH
+/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/home/dmtsai/.local/bin:/home/dmtsai/bin
+# 記不記得我們前一章說過，目前 /bin 是連結到 /usr/bin 當中的喔！
+```
+
+PATH 一定是大写，这个变数的内容是由一堆目录所组成的，每个目录中间用冒号(:)来间隔，每个目录是有【顺序】之分的。仔细看以下上面的输出，你可以发现但无论是 root 还是 hare 都有 /bin 或 /usr/bin 这个目录在PATH变数内，所以当然能够在任何地方执行ls来找到 /bin/ls 执行档喽，因为 /bin 在centOS 7 当中，就是链接到 /usr/bin 去的，所以这两个目录内容会一模一样。  
+
 
 ## 2、文件与目录管理
 
