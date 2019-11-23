@@ -262,14 +262,375 @@ PATH 一定是大写，这个变数的内容是由一堆目录所组成的，每
                        而非內容變更時間 (modification time)
 ```
 
+在linux系统当中，这个ls指令可能是最常被执行的把！因为我们随时都要知道档案或者是目录的相关资讯啊。  
+不过，当我们Linux的档案记录的资讯太多，ls没有需要全部列出来，所以，当你只有下达ls时，预设显示的只有：**非吟唱档的档名、以档名进行排序及档名代表的颜色显示**  
+如果想要加入其他显示资讯时，可以加入上头提到的那些有用的选项，例如： -l 显示长串资料内容； -a 显示隐藏档案等  
+
+```
+範例一：將家目錄下的所有檔案列出來(含屬性與隱藏檔)
+[root@study ~]# ls -al ~
+total 56
+dr-xr-x---.  5 root root 4096 Jun  4 19:49 .
+dr-xr-xr-x. 17 root root 4096 May  4 17:56 ..
+-rw-------.  1 root root 1816 May  4 17:57 anaconda-ks.cfg
+-rw-------.  1 root root 6798 Jun  4 19:53 .bash_history
+-rw-r--r--.  1 root root   18 Dec 29  2013 .bash_logout
+-rw-r--r--.  1 root root  176 Dec 29  2013 .bash_profile
+-rw-rw-rw-.  1 root root  176 Dec 29  2013 .bashrc
+-rw-r--r--.  1 root root  176 Jun  3 00:04 .bashrc_test
+drwx------.  4 root root   29 May  6 00:14 .cache
+drwxr-xr-x.  3 root root   17 May  6 00:14 .config
+# 這個時候你會看到以 . 為開頭的幾個檔案，以及目錄檔 (.) (..) .config 等等，
+# 不過，目錄檔檔名都是以深藍色顯示，有點不容易看清楚就是了。
+
+範例二：承上題，不顯示顏色，但在檔名末顯示出該檔名代表的類型(type)
+[root@study ~]# ls -alF --color=never  ~
+total 56
+dr-xr-x---.  5 root root 4096 Jun  4 19:49 ./
+dr-xr-xr-x. 17 root root 4096 May  4 17:56 ../
+-rw-------.  1 root root 1816 May  4 17:57 anaconda-ks.cfg
+-rw-------.  1 root root 6798 Jun  4 19:53 .bash_history
+-rw-r--r--.  1 root root   18 Dec 29  2013 .bash_logout
+-rw-r--r--.  1 root root  176 Dec 29  2013 .bash_profile
+-rw-rw-rw-.  1 root root  176 Dec 29  2013 .bashrc
+-rw-r--r--.  1 root root  176 Jun  3 00:04 .bashrc_test
+drwx------.  4 root root   29 May  6 00:14 .cache/
+drwxr-xr-x.  3 root root   17 May  6 00:14 .config/
+# 注意看到顯示結果的第一行，嘿嘿～知道為何我們會下達類似 ./command 
+# 之類的指令了吧？因為 ./ 代表的是『目前目錄下』的意思啊！至於什麼是 FIFO/Socket ？
+# 請參考前一章節的介紹啊！另外，那個.bashrc 時間僅寫2013，能否知道詳細時間？
+
+範例三：完整的呈現檔案的修改時間 (modification time)
+[root@study ~]# ls -al --full-time  ~
+total 56
+dr-xr-x---.  5 root root 4096 2015-06-04 19:49:54.520684829 +0800 .
+dr-xr-xr-x. 17 root root 4096 2015-05-04 17:56:38.888000000 +0800 ..
+-rw-------.  1 root root 1816 2015-05-04 17:57:02.326000000 +0800 anaconda-ks.cfg
+-rw-------.  1 root root 6798 2015-06-04 19:53:41.451684829 +0800 .bash_history
+-rw-r--r--.  1 root root   18 2013-12-29 10:26:31.000000000 +0800 .bash_logout
+-rw-r--r--.  1 root root  176 2013-12-29 10:26:31.000000000 +0800 .bash_profile
+-rw-rw-rw-.  1 root root  176 2013-12-29 10:26:31.000000000 +0800 .bashrc
+-rw-r--r--.  1 root root  176 2015-06-03 00:04:16.916684829 +0800 .bashrc_test
+drwx------.  4 root root   29 2015-05-06 00:14:56.960764950 +0800 .cache
+drwxr-xr-x.  3 root root   17 2015-05-06 00:14:56.975764950 +0800 .config
+# 請仔細看，上面的『時間』欄位變了喔！變成較為完整的格式。
+# 一般來說， ls -al 僅列出目前短格式的時間，有時不會列出年份，
+# 藉由 --full-time 可以查閱到比較正確的完整時間格式啊！
+```
+
+其实 ls 的用法还有很多，包括**查阅档案所在 i-node 号码的 ls -i 选项，以及用来进行档案排序的 -S 选项** ,还有用来查阅不同时间的动作的 --time=atime 等选项。  
+这些选项的存在都是因为linux档案系统记录了很多有用的资讯的缘故。那么linux的档案系统中，这些与权限、属性有关的资料放在哪里呢？放在 i-node 里面。（下一章深入讲解)  
+无论如何， ls 最常被使用到的功能还是那个 -l 的选项，为此，很多 distribution 在预设的情况中，已经将ll（L的小写）设定为 ls -l 的意思了！  
+这个功能是 Bash shell 的alias 功能呢，也就是说我们可以直接输入 ll 就等于输入 ls -l 了。  
 
 ### 2.2、复制、删除与移动：cp、rm、mv
 
+- 复制档案，使用cp（copy）这个指令，这个指令除了单纯的复制之外，还可以建立链接档（就是捷径喽),比如两个档案的新旧而予以更新，以及赋值整个目录等等的功能。  
+- 移动目录与档案，使用mv(move)这个指令，也可以直接拿来做更名（rename）  
+- 删除文档与目录就是 rm(remove)这个指令喽。  
+
+--------
+
+### cp(扶着档案或目录)
+
+```
+
+[root@study ~]# cp [-adfilprsu] 來源檔(source) 目標檔(destination)
+[root@study ~]# cp [options] source1 source2 source3 .... directory
+選項與參數：
+-a  ：相當於 -dr --preserve=all 的意思，至於 dr 請參考下列說明；(常用)
+-d  ：若來源檔為連結檔的屬性(link file)，則複製連結檔屬性而非檔案本身；
+-f  ：為強制(force)的意思，若目標檔案已經存在且無法開啟，則移除後再嘗試一次；
+-i  ：若目標檔(destination)已經存在時，在覆蓋時會先詢問動作的進行(常用)
+-l  ：進行硬式連結(hard link)的連結檔建立，而非複製檔案本身；
+-p  ：連同檔案的屬性(權限、用戶、時間)一起複製過去，而非使用預設屬性(備份常用)；
+-r  ：遞迴持續複製，用於目錄的複製行為；(常用)
+-s  ：複製成為符號連結檔 (symbolic link)，亦即『捷徑』檔案；
+-u  ：destination 比 source 舊才更新 destination，或 destination 不存在的情況下才複製。
+--preserve=all ：除了 -p 的權限相關參數外，還加入 SELinux 的屬性, links, xattr 等也複製了。
+最後需要注意的，如果來源檔有兩個以上，則最後一個目的檔一定要是『目錄』才行！
+```
+
+赋值(cp)这个指令是非常重要的，不同身份者执行这个指令会有不同的结果产生，尤其是那个 -a， -p的选项，对于不同身份来说，差异则非常的大！   
+
+```
+範例一：用root身份，將家目錄下的 .bashrc 複製到 /tmp 下，並更名為 bashrc
+[root@study ~]# cp ~/.bashrc /tmp/bashrc
+[root@study ~]# cp -i ~/.bashrc /tmp/bashrc
+cp: overwrite `/tmp/bashrc'? n  <==n不覆蓋，y為覆蓋
+# 重複作兩次動作，由於 /tmp 底下已經存在 bashrc 了，加上 -i 選項後，
+# 則在覆蓋前會詢問使用者是否確定！可以按下 n 或者 y 來二次確認呢！
+
+範例二：變換目錄到/tmp，並將/var/log/wtmp複製到/tmp且觀察屬性：
+[root@study ~]# cd /tmp
+[root@study tmp]# cp /var/log/wtmp . <==想要複製到目前的目錄，最後的 . 不要忘
+[root@study tmp]# ls -l /var/log/wtmp wtmp
+-rw-rw-r--. 1 root utmp 28416 Jun 11 18:56 /var/log/wtmp
+-rw-r--r--. 1 root root 28416 Jun 11 19:01 wtmp
+# 注意上面的特殊字體，在不加任何選項的情況下，檔案的某些屬性/權限會改變；
+# 這是個很重要的特性！要注意喔！還有，連檔案建立的時間也不一樣了！
+# 那如果你想要將檔案的所有特性都一起複製過來該怎辦？可以加上 -a 喔！如下所示：
+
+[root@study tmp]# cp -a /var/log/wtmp wtmp_2
+[root@study tmp]# ls -l /var/log/wtmp wtmp_2
+-rw-rw-r--. 1 root utmp 28416 Jun 11 18:56 /var/log/wtmp
+-rw-rw-r--. 1 root utmp 28416 Jun 11 18:56 wtmp_2
+# 瞭了吧！整個資料特性完全一模一樣ㄟ！真是不賴～這就是 -a 的特性！
+```
+
+这个cp的功能很多，由于我们经常会复制一些资料，所以也会常用这个指令。  
+一般来说我们去复制别人的资料（当然，该档案必须要有read的权限才行）时，总是希望复制到的资料最后是我们自己的，所以：  
+在预设条件中，cp的来源档与目的档的权限是不同的，目的档的拥有者通常回事指令操作这本身。  
+
+由于有了这个特性，因此当我们在进行备份的时候，某些需要特别注意的特殊权限档案，例如密码档(/etc/shadow)以及一些设定档，就不能直接以cp来复制，而必须要加上 -a 或 -p 等等可以完整复制档案权限的选项才行！  
+另外，如果你想要复制档案给其他的使用者，也必须要注意到档案的权限（包含读、写、执行以及档案拥有者等等），否则，其他人还是无法针对你给予的档案进行修订的动作哦！注意注意！  
+
+```
+
+範例三：複製 /etc/ 這個目錄下的所有內容到 /tmp 底下
+[root@study tmp]# cp /etc/ /tmp
+cp: omitting directory `/etc'   <== 如果是目錄則不能直接複製，要加上 -r 的選項
+[root@study tmp]# cp -r /etc/ /tmp
+# 還是要再次的強調喔！ -r 是可以複製目錄，但是，檔案與目錄的權限可能會被改變
+# 所以，也可以利用『 cp -a /etc /tmp 』來下達指令喔！尤其是在備份的情況下！
+
+範例四：將範例一複製的 bashrc 建立一個連結檔 (symbolic link)
+[root@study tmp]# ls -l bashrc
+-rw-r--r--. 1 root root 176 Jun 11 19:01 bashrc  <==先觀察一下檔案情況
+[root@study tmp]# cp -s bashrc bashrc_slink
+[root@study tmp]# cp -l bashrc bashrc_hlink
+[root@study tmp]# ls -l bashrc*
+-rw-r--r--. 2 root root 176 Jun 11 19:01 bashrc         <==與原始檔案不太一樣了！
+-rw-r--r--. 2 root root 176 Jun 11 19:01 bashrc_hlink
+lrwxrwxrwx. 1 root root   6 Jun 11 19:06 bashrc_slink -> bashrc
+```
+
+这里的范例四很有意思：  
+使用 -l 和 -s 都会建立所谓的连接档(link file),但是这两种连接档有不一样的情况。  
+- -l 是所谓的实体连接(hard link),我们也称硬链接。  
+- -s 是所谓的符号连接(symbolic link),我们也称软链接。  
+简单来说软链接就是一个【捷径】，所以会看到档名右边会有个指向(->)的符号。  
+至于硬链接则与原档案的属性权限完全一模一样，与尚未进行连结前的差异则是第二个link数由1变成2了。由于涉及到 i-node 相关知识，需要等到档案系统(filesystem)的时候在学习。  
+
+```
+
+範例五：若 ~/.bashrc 比 /tmp/bashrc 新才複製過來
+[root@study tmp]# cp -u ~/.bashrc /tmp/bashrc
+# 這個 -u 的特性，是在目標檔案與來源檔案有差異時，才會複製的。
+# 所以，比較常被用於『備份』的工作當中喔！ ^_^
+
+範例六：將範例四造成的 bashrc_slink 複製成為 bashrc_slink_1 與bashrc_slink_2
+[root@study tmp]# cp bashrc_slink bashrc_slink_1
+[root@study tmp]# cp -d bashrc_slink bashrc_slink_2
+[root@study tmp]# ls -l bashrc bashrc_slink*
+-rw-r--r--. 2 root root 176 Jun 11 19:01 bashrc
+lrwxrwxrwx. 1 root root   6 Jun 11 19:06 bashrc_slink -> bashrc
+-rw-r--r--. 1 root root 176 Jun 11 19:09 bashrc_slink_1            <==與原始檔案相同
+lrwxrwxrwx. 1 root root   6 Jun 11 19:10 bashrc_slink_2 -> bashrc  <==是連結檔！
+# 這個例子也是很有趣喔！原本複製的是連結檔，但是卻將連結檔的實際檔案複製過來了
+# 也就是說，如果沒有加上任何選項時，cp複製的是原始檔案，而非連結檔的屬性！
+# 若要複製連結檔的屬性，就得要使用 -d 的選項了！如 bashrc_slink_2 所示。
+
+範例七：將家目錄的 .bashrc 及 .bash_history 複製到 /tmp 底下
+[root@study tmp]# cp ~/.bashrc ~/.bash_history /tmp
+# 可以將多個資料一次複製到同一個目錄去！最後面一定是目錄！
+```
+
+```
+例題：
+你能否使用 dmtsai 的身份，完整的複製/var/log/wtmp檔案到/tmp底下，並更名為dmtsai_wtmp呢？
+答：
+實際做看看的結果如下：
+[dmtsai@study ~]$ cp -a /var/log/wtmp /tmp/dmtsai_wtmp
+[dmtsai@study ~]$ ls -l /var/log/wtmp /tmp/dmtsai_wtmp
+-rw-rw-r--. 1 dmtsai dmtsai 28416  6月 11 18:56 /tmp/dmtsai_wtmp
+-rw-rw-r--. 1 root   utmp   28416  6月 11 18:56 /var/log/wtmp
+由於 dmtsai 的身份並不能隨意修改檔案的擁有者與群組，因此雖然能夠複製wtmp的相關權限與時間等屬性， 但是與擁有者、群組相關的，原本 dmtsai 身份無法進行的動作，即使加上 -a 選項，也是無法達成完整複製權限的！
+```
+
+总之，由于cp有种种的大难属性与权限的特性，所以，在赋值时，必须要清楚的了解到：  
+
+- 是否需要完整的保留原来档案的资讯？  
+- 来源档案是否为连结档(symbolic link file)?  
+- 来源档是否为特殊的档案，例如 FIFO， socket等？  
+- 来源档是否为目录？  
+
+--------
+
+#### rm （移除档案或目录）
+
+```
+[root@study ~]# rm [-fir] 檔案或目錄
+選項與參數：
+-f  ：就是 force 的意思，忽略不存在的檔案，不會出現警告訊息；
+-i  ：互動模式，在刪除前會詢問使用者是否動作
+-r  ：遞迴刪除啊！最常用在目錄的刪除了！這是非常危險的選項！！！
+
+範例一：將剛剛在 cp 的範例中建立的 bashrc 刪除掉！
+[root@study ~]# cd /tmp
+[root@study tmp]# rm -i bashrc
+rm: remove regular file `bashrc'? y
+# 如果加上 -i 的選項就會主動詢問喔，避免你刪除到錯誤的檔名！
+
+範例二：透過萬用字元*的幫忙，將/tmp底下開頭為bashrc的檔名通通刪除：
+[root@study tmp]# rm -i bashrc*
+# 注意那個星號，代表的是 0 到無窮多個任意字元喔！很好用的東西！
+
+範例三：將 cp 範例中所建立的 /tmp/etc/ 這個目錄刪除掉！
+[root@study tmp]# rmdir /tmp/etc
+rmdir: failed to remove '/tmp/etc': Directory not empty   <== 刪不掉啊！因為這不是空的目錄！
+[root@study tmp]# rm -r /tmp/etc
+rm: descend into directory `/tmp/etc'? y
+rm: remove regular file `/tmp/etc/fstab'? y
+rm: remove regular empty file `/tmp/etc/crypttab'? ^C  <== 按下 [ctrl]+c 中斷
+.....(中間省略).....
+# 因為身份是 root ，預設已經加入了 -i 的選項，所以你要一直按 y 才會刪除！
+# 如果不想要繼續按 y ，可以按下『 [ctrl]-c 』來結束 rm 的工作。
+# 這是一種保護的動作，如果確定要刪除掉此目錄而不要詢問，可以這樣做：
+[root@study tmp]# \rm -r /tmp/etc
+# 在指令前加上反斜線，可以忽略掉 alias 的指定選項喔！至於 alias 我們在bash再談！
+# 拜託！這個範例很可怕！你不要刪錯了！刪除 /etc 系統是會掛掉的！
+
+範例四：刪除一個帶有 - 開頭的檔案
+[root@study tmp]# touch ./-aaa-  <==touch這個指令可以建立空檔案！
+[root@study tmp]# ls -l 
+-rw-r--r--. 1 root   root       0 Jun 11 19:22 -aaa-  <==檔案大小為0，所以是空檔案
+[root@study tmp]# rm -aaa-
+rm: invalid option -- 'a'                    <== 因為 "-" 是選項嘛！所以系統誤判了！
+Try 'rm ./-aaa-' to remove the file `-aaa-'. <== 新的 bash 有給建議的
+Try 'rm --help' for more information.
+[root@study tmp]# rm ./-aaa-
+```
+
+这是移除的指令(remove),要注意的是：  
+通常在linux系统下，为了怕档案被root误杀，所以很多distributions都已经预设加入 -i 这个选项了！  
+而如果想要连目录下的东西都一起杀掉的话，那就要使用 -r 这个选项了！**不过在使用 【rm -r】这个指令之前，请千万注意了，因为该目录或档案【肯定】会被root杀掉** 因为系统不会再次询问你是否要砍掉哦！所以那是个超级严重的指令下达，如果你确定该目录不要了，那么用这个递归杀掉是个不错的方式！  
+
+另外，范例四也是很有趣的例子，之前就说过，档名最好不要使用“-”号开头，因为后面接的是选项，因此，单纯的使用【rm -aaa-】系统的指令就会误判了。那如果使用后面会谈到的正则表达式时，还是会出现问题的。  
+所以，只能避过首字符用“-”的方法了。就是加上本身目录【./】即可  
+如果 man rm 的话，其实还有一种方法，那就是【rm -- -aaa-】也可以啊！  
+
+--------
+
+#### mv (移动档案与目录，或更名)
+
+```
+[root@study ~]# mv [-fiu] source destination
+[root@study ~]# mv [options] source1 source2 source3 .... directory
+選項與參數：
+-f  ：force 強制的意思，如果目標檔案已經存在，不會詢問而直接覆蓋；
+-i  ：若目標檔案 (destination) 已經存在時，就會詢問是否覆蓋！
+-u  ：若目標檔案已經存在，且 source 比較新，才會更新 (update)
+
+範例一：複製一檔案，建立一目錄，將檔案移動到目錄中
+[root@study ~]# cd /tmp
+[root@study tmp]# cp ~/.bashrc bashrc
+[root@study tmp]# mkdir mvtest
+[root@study tmp]# mv bashrc mvtest
+# 將某個檔案移動到某個目錄去，就是這樣做！
+
+範例二：將剛剛的目錄名稱更名為 mvtest2
+[root@study tmp]# mv mvtest mvtest2 <== 這樣就更名了！簡單～
+# 其實在 Linux 底下還有個有趣的指令，名稱為 rename ，
+# 該指令專職進行多個檔名的同時更名，並非針對單一檔名變更，與mv不同。請man rename。
+
+範例三：再建立兩個檔案，再全部移動到 /tmp/mvtest2 當中
+[root@study tmp]# cp ~/.bashrc bashrc1
+[root@study tmp]# cp ~/.bashrc bashrc2
+[root@study tmp]# mv bashrc1 bashrc2 mvtest2
+# 注意到這邊，如果有多個來源檔案或目錄，則最後一個目標檔一定是『目錄！』
+# 意思是說，將所有的資料移動到該目錄的意思！
+```
+
+这是搬移(move)的意思！当你需要移动档案或目录的时候，就可以使用这个指令了！  
+同时你也可以使用 -u（update）来测试新旧档案，看看是否需要搬移！  
+另外一个用途就是【变更档名】，我们可以很轻易的使用mv来变更一个档案的档名呢！  
+不过，在linux才有的指令当中，有个 rename ，可以用来更改大量的档名。  
+可以使用 man rename 来查阅以下，也是挺有趣的指令哦！  
+
 ### 2.3、获取路径的文件名与目录名称pwd
+
+- 每个档案的完整档名包含：前面的目录与最终的档名。  
+而每个档名的长度都可以达到255个字节，那么你怎么知道那个是档名？那个是目录名？就是用斜线(/)来分辨啊。  
+取得档名或者是目录名称，一般的用途应该是在写程序的时候用来判断只用的，这部分的指令可以在 shell scripts 里头再学习。  
+
+先学习 【basename】 和 【dirname】 的用途！  
+
+```
+[root@study ~]# basename /etc/sysconfig/network
+network         <== 很簡單！就取得最後的檔名～
+[root@study ~]# dirname /etc/sysconfig/network
+/etc/sysconfig  <== 取得的變成目錄名了！
+
+```
+
 
 ## 3、文件内容查看
 
+如果我们要查阅一个档案的内容是，该怎么办呢？  
+最常用的指令有： cat 与 more 及 less  
+
+如果需要查看一个很大的档案的最后几行字，怎么办呢？  
+可以使用 tail 指令啊，此外，tac 这个指令也可以达到这个目的哦。  
+
+- cat 由第一行开始显示档案内容  
+- tac 从最后一行开始显示，可以看出 tac 是 cat 的到这写。  
+- nl 显示的时候，顺道输出行号！  
+- more 一页一页的显示档案内容  
+- less 与 more 类似，但是比 more 更好的是，它可以往前翻页！  
+- head 只看头几行  
+- tail 只看尾巴几行  
+- od 以二进位的方式读取档案内容  
+
 ### 3.1、直接查看文件内容
+
+直接查阅一个档案的内容可以使用 cat/tac/nl 这几个指令啊！  
+
+--------
+
+#### cat (concatenate)
+
+```
+[root@study ~]# cat [-AbEnTv]
+選項與參數：
+-A  ：相當於 -vET 的整合選項，可列出一些特殊字符而不是空白而已；
+-b  ：列出行號，僅針對非空白行做行號顯示，空白行不標行號！
+-E  ：將結尾的斷行字元 $ 顯示出來；
+-n  ：列印出行號，連同空白行也會有行號，與 -b 的選項不同；
+-T  ：將 [tab] 按鍵以 ^I 顯示出來；
+-v  ：列出一些看不出來的特殊字符
+
+範例一：檢閱 /etc/issue 這個檔案的內容
+[root@study ~]# cat /etc/issue
+\S
+Kernel \r on an \m
+
+範例二：承上題，如果還要加印行號呢？
+[root@study ~]# cat -n /etc/issue
+     1  \S
+     2  Kernel \r on an \m
+     3
+# 所以這個檔案有三行！看到了吧！可以印出行號呢！這對於大檔案要找某個特定的行時，有點用處！
+# 如果不想要編排空白行的行號，可以使用『cat -b /etc/issue』，自己測試看看：
+
+範例三：將 /etc/man_db.conf 的內容完整的顯示出來(包含特殊字元)
+[root@study ~]# cat -A /etc/man_db.conf
+# $
+....(中間省略)....
+MANPATH_MAP^I/bin^I^I^I/usr/share/man$
+MANPATH_MAP^I/usr/bin^I^I/usr/share/man$
+MANPATH_MAP^I/sbin^I^I^I/usr/share/man$
+MANPATH_MAP^I/usr/sbin^I^I/usr/share/man$
+.....(底下省略).....
+# 上面的結果限於篇幅，鳥哥刪除掉很多資料了。另外，輸出的結果並不會有特殊字體，
+# 鳥哥上面的特殊字體是要讓您發現差異點在哪裡就是了。基本上，在一般的環境中，
+# 使用 [tab] 與空白鍵的效果差不多，都是一堆空白啊！我們無法知道兩者的差別。
+# 此時使用 cat -A 就能夠發現那些空白的地方是啥鬼東西了！[tab]會以 ^I 表示，
+# 斷行字元則是以 $ 表示，所以你可以發現每一行後面都是 $ 啊！不過斷行字元
+# 在Windows/Linux則不太相同，Windows的斷行字元是 ^M$ 囉。
+# 這部分我們會在第九章 vim 軟體的介紹時，再次的說明到喔！```
+
+
 
 ### 3.2、可翻页查看
 
