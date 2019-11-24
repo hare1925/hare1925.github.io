@@ -628,13 +628,216 @@ MANPATH_MAP^I/usr/sbin^I^I/usr/share/man$
 # 此時使用 cat -A 就能夠發現那些空白的地方是啥鬼東西了！[tab]會以 ^I 表示，
 # 斷行字元則是以 $ 表示，所以你可以發現每一行後面都是 $ 啊！不過斷行字元
 # 在Windows/Linux則不太相同，Windows的斷行字元是 ^M$ 囉。
-# 這部分我們會在第九章 vim 軟體的介紹時，再次的說明到喔！```
+# 這部分我們會在第九章 vim 軟體的介紹時，再次的說明到喔！
+```
 
+Linux里面有【猫】指令？不是的，cat 是 concatenate(连续)的简写，主要功能是将一个档案的内容连续的打印在屏幕上。如果前面加上 `-n` 或 `-b` 的话，则每一行前面还会加上行号哦！**这里的 -n 是显示所有的行号，而 -b 则只是按照非空行来数**  
 
+鸟哥还是比较少用cat的，毕竟档你的档案内容的行数超过40行以上，根本来不及在屏幕上看到结果！  
+所以，配合等一下要介绍的 more 或者是 less 来执行比较好！  
+此外，如果是一般的 DOS 档案时，就需要特别留意一些奇奇怪怪的符号了，例如断行与[tab]等，要显示出来，就得加入 -A 之类的选项了！  
+
+--------
+
+#### tac (反向列示)
+
+```
+
+[root@study ~]# tac /etc/issue
+
+Kernel \r on an \m
+\S
+# 嘿嘿！與剛剛上面的範例一比較，是由最後一行先顯示喔！
+```
+
+tac这个好玩了！可以看一下，cat 与 tac ，刚好是反过来写的，所以它的功能就是跟cat相反的了。  
+cat是由【第一行到最后一行连续显示在屏幕上】  
+tac则是【由最后一行到第一行反向在屏幕上显示出来】  
+
+--------
+
+#### nl (添加行号列印)
+
+```
+[root@study ~]# nl [-bnw] 檔案
+選項與參數：
+-b  ：指定行號指定的方式，主要有兩種：
+      -b a ：表示不論是否為空行，也同樣列出行號(類似 cat -n)；
+      -b t ：如果有空行，空的那一行不要列出行號(預設值)；
+-n  ：列出行號表示的方法，主要有三種：
+      -n ln ：行號在螢幕的最左方顯示；
+      -n rn ：行號在自己欄位的最右方顯示，且不加 0 ；
+      -n rz ：行號在自己欄位的最右方顯示，且加 0 ；
+-w  ：行號欄位的佔用的字元數。
+
+範例一：用 nl 列出 /etc/issue 的內容
+[root@study ~]# nl /etc/issue
+     1  \S
+     2  Kernel \r on an \m
+
+# 注意看，這個檔案其實有三行，第三行為空白(沒有任何字元)，
+# 因為他是空白行，所以 nl 不會加上行號喔！如果確定要加上行號，可以這樣做：
+
+[root@study ~]# nl -b a /etc/issue
+     1  \S
+     2  Kernel \r on an \m
+     3
+# 呵呵！行號加上來囉～那麼如果要讓行號前面自動補上 0 呢？可這樣
+
+[root@study ~]# nl -b a -n rz /etc/issue
+000001  \S
+000002  Kernel \r on an \m
+000003
+# 嘿嘿！自動在自己欄位的地方補上 0 了～預設欄位是六位數，如果想要改成 3 位數？
+
+[root@study ~]# nl -b a -n rz -w 3 /etc/issue
+001     \S
+002     Kernel \r on an \m
+003
+# 變成僅有 3 位數囉～
+```
+
+nl 可以将输出的档案内容自动的加上行号！其预设的结果与 cat -n 优点不太一样， nl 可以将行号作比较多的显示设计，包括位数与是否自动补齐 0 等等的功能呢。  
 
 ### 3.2、可翻页查看
 
+前面提到的 nl 与 cat，tac 等等，都是一次性的将资料一口气显示到屏幕上面，那有没有可以进行一页一页反动的指令啊？  
+一页一页的观察，才不会前面的资料看不到啊。  
+那就是 more 与 less 喽！  
+
+--------
+
+#### more (一页一页翻动)
+
+```
+[root@study ~]# more /etc/man_db.conf
+#
+#
+# This file is used by the man-db package to configure the man and cat paths.
+# It is also used to provide a manpath for those without one by examining
+# their PATH environment variable. For details see the manpath(5) man page.
+#
+.....(中間省略).....
+--More--(28%)  <== 重點在這一行喔！你的游標也會在這裡等待你的指令
+```
+
+仔细看上面的范例，如果 more 后面接的档案内容行数大于屏幕输出的行数时，就会出现类似上面的图像。重点在最后一行，最后一行会显示出目前显示的百分比，而且还可以在最后一行输入一些有用的指令呢！  
+在 more 这个程序的运作过程中，你有几个按键可以按的：  
+
+- 空白键(space) : 代表向下翻一页；  
+- Enter : 代表向下翻【一行】；
+- /字串 ： 代表在这个显示的内容当中，向下搜寻【字串】这个关键字；  
+- :f : like显示出档名以及目前显示的行数；  
+- q ： 代表立刻离开 more， 不在显示档案内容；  
+- b 或[ctrl]-b : 代表往回翻页，不过这个动作只对档案有用，对管线无用。  
+
+要离开more这个指令的显示工作，可以按q。  
+向下翻页就是用空白即可。  
+比较有用的就是搜索字符串的功能，例如：  
+
+```
+
+[root@study ~]# more /etc/man_db.conf
+#
+#
+# This file is used by the man-db package to configure the man and cat paths.
+# It is also used to provide a manpath for those without one by examining
+# their PATH environment variable. For details see the manpath(5) man page.
+#
+....(中間省略)....
+/MANPATH   <== 輸入了 / 之後，游標就會自動跑到最底下一行等待輸入！v
+```
+
+如同上面的说明，输入了 / 之后，光标会到最后一行，并等待你的输入，你输入了字符串并按下[enter]之后，more就会开始向下搜寻字符串了，而重复搜寻一个字符串，可以直接按下 n 即可。最后按q离开more。  
+
+--------
+
+#### less (一页一页翻动)
+
+```
+[root@study ~]# less /etc/man_db.conf
+#
+#
+# This file is used by the man-db package to configure the man and cat paths.
+# It is also used to provide a manpath for those without one by examining
+# their PATH environment variable. For details see the manpath(5) man page.
+#
+.....(中間省略).....
+:   <== 這裡可以等待你輸入指令！
+```
+
+less 的用法比起 more 又更加有弹性，在 more 的时候，我们并没有办法向前翻页，只能往后面看，但或使用less时，就可以使用[pageup][pagedown]等按键的功能功能前往前后翻看文件。  
+
+除此之外，在less里头可以拥有更多的【搜索】功能，不止可以向下搜索，也可以向上搜索，非常不错，可用的指令有：  
+
+- 空白键 ： 向下翻动一页；
+- 【pagedown】 ： 向下翻动一页；
+- 【pageup】 ： 向上翻动一页；
+- /字串 ： 向下搜寻【字串】的功能；
+- ？字串 ： 向上搜寻【字串】的功能；
+- n ： 重复前一个搜寻（与 / 或 ? 有关）
+- N ： 反向的重复前一个搜寻(与 / 或 ? 有关）
+- g ： 前进到这个资料的第一行去；
+- G ： 前进到这个资料的最后一行去（注意大小写）；
+- q ： 离开 less 这个程式；  
+
+查阅档案还可以进行搜寻的动作，less是否很不错呢？其实less还有很多的功能！更详细的使用方法可以用 man less 查询以下啊！  
+你是否会觉得less 使用的画面与环境与 man page 非常类似呢？没错，因为man这个指令就是呼叫less来显示说明文件的内容的！现在是否会觉得less很重要呢？  
+--------
+
 ### 3.3、数据截取
+
+我们可以将输出的资料最为一个最简单的截取，那就是取出档案前面几行(head)或取出后面几行(tail)文字的功能。  
+不过，需要之一的是，head和tail都是以【行】为单位来进行资料截取的哦！  
+
+--------
+
+#### head (取出前面的几行)
+
+```
+
+[root@study ~]# head [-n number] 檔案 
+選項與參數：
+-n  ：後面接數字，代表顯示幾行的意思
+
+[root@study ~]# head /etc/man_db.conf
+# 預設的情況中，顯示前面十行！若要顯示前 20 行，就得要這樣：
+[root@study ~]# head -n 20 /etc/man_db.conf
+
+範例：如果後面100行的資料都不列印，只列印/etc/man_db.conf的前面幾行，該如何是好？
+[root@study ~]# head -n -100 /etc/man_db.conf
+```
+
+head 的英文意思就是 【头】了，那么这个东西的用法自然就是显示出一个档案的前几行了。  
+若没有加上 `-n` 这个选项时，预设只显示十行。  
+若是只要一行呢？那就加入【head -n 1 filename】即可！  
+
+另外，那个 -n 选项后面的参数比较有趣，如果接的是负数，例如上面的范例 `-n -100` 时，代表列前的所有行数，但不包括后面的 100 行。  
+例如：centos 7.1 的 /etc/man_db.conf 共有 131 行，则上述的指令【head -n -100 /etc/man_db.conf】就会列出前面31行，后面100行不会列印出来了。  
+
+--------
+
+#### tail (取出后面几行) 
+
+```
+[root@study ~]# tail [-n number] 檔案 
+選項與參數：
+-n  ：後面接數字，代表顯示幾行的意思
+-f  ：表示持續偵測後面所接的檔名，要等到按下[ctrl]-c才會結束tail的偵測
+
+[root@study ~]# tail /etc/man_db.conf
+# 預設的情況中，顯示最後的十行！若要顯示最後的 20 行，就得要這樣：
+[root@study ~]# tail -n 20 /etc/man_db.conf
+
+範例一：如果不知道/etc/man_db.conf有幾行，卻只想列出100行以後的資料時？
+[root@study ~]# tail -n +100 /etc/man_db.conf
+
+範例二：持續偵測/var/log/messages的內容
+[root@study ~]# tail -f /var/log/messages
+  <==要等到輸入[ctrl]-c之後才會離開tail這個指令的偵測！
+```
+
+
 
 ### 3.4、非纯文本文件：od
 
