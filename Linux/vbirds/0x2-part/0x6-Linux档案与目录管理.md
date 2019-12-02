@@ -841,7 +841,142 @@ head 的英文意思就是 【头】了，那么这个东西的用法自然就�
 
 ### 3.4、非纯文本文件：od
 
+我们前面提到的，都是在查阅纯文字档案的内容。那么万一我们想要查阅非文字档案，例如： `/usr/bin/passwd` 这个执行档案的内容时，又该如何去读出资讯呢？事实上，由于执行档通常是 binary file ，使用上头提到的指令来读取他的内容时，却是会产生类似乱码的资料！怎么办？没关系，我们可以利用 od 这个指令来读取哦！  
+
+```
+[root@study ~]# od [-t TYPE] 檔案
+選項或參數：
+-t  ：後面可以接各種『類型 (TYPE)』的輸出，例如：
+      a       ：利用預設的字元來輸出；
+      c       ：使用 ASCII 字元來輸出
+      d[size] ：利用十進位(decimal)來輸出資料，每個整數佔用 size bytes ；
+      f[size] ：利用浮點數值(floating)來輸出資料，每個數佔用 size bytes ；
+      o[size] ：利用八進位(octal)來輸出資料，每個整數佔用 size bytes ；
+      x[size] ：利用十六進位(hexadecimal)來輸出資料，每個整數佔用 size bytes ；
+
+範例一：請將/usr/bin/passwd的內容使用ASCII方式來展現！
+[root@study ~]# od -t c /usr/bin/passwd
+0000000 177   E   L   F 002 001 001  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0000020 003  \0   >  \0 001  \0  \0  \0 364   3  \0  \0  \0  \0  \0  \0
+0000040   @  \0  \0  \0  \0  \0  \0  \0   x   e  \0  \0  \0  \0  \0  \0
+0000060  \0  \0  \0  \0   @  \0   8  \0  \t  \0   @  \0 035  \0 034  \0
+0000100 006  \0  \0  \0 005  \0  \0  \0   @  \0  \0  \0  \0  \0  \0  \0
+.....(後面省略)....
+# 最左邊第一欄是以 8 進位來表示bytes數。以上面範例來說，第二欄0000020代表開頭是
+# 第 16 個 byes (2x8) 的內容之意。
+
+範例二：請將/etc/issue這個檔案的內容以8進位列出儲存值與ASCII的對照表
+[root@study ~]# od -t oCc /etc/issue
+0000000 134 123 012 113 145 162 156 145 154 040 134 162 040 157 156 040
+          \   S  \n   K   e   r   n   e   l       \   r       o   n
+0000020 141 156 040 134 155 012 012
+          a   n       \   m  \n  \n
+0000027
+# 如上所示，可以發現每個字元可以對應到的數值為何！要注意的是，該數值是 8 進位喔！
+# 例如 S 對應的記錄數值為 123 ，轉成十進位：1x8^2+2x8+3=83。
+```
+
+利用这个指令，可以将data file 或者 binary file 的内容资料读出来哦！虽然读出来的数值预设是使用非文字档，亦即16进位的数值来显示的，不过，我们还是可以透过 `-t c` 的选项参数来讲资料内的字节以 ASCII 类型的字节显示，虽然对于一般使用者来说，这个指令的用处可能不大，但是对于工程师来说，这个指令可以将 binary file 的内容作出一个大致的输出，他们可以看得出很多东西了。。。  
+
+```
+例如：
+我不想找 google，想要立刻找到 password 這幾個字的 ASCII 對照，該如何透過 od 來判斷？
+答：
+其實可以透過剛剛上一個小節談到的管線命令來處理！如下所示：
+echo password | od -t oCc
+echo 可以在螢幕上面顯示任何資訊，而這個資訊不由螢幕輸出，而是傳給 od 去繼續處理！就可以得到 ASCII code 對照囉！
+```
+
 ### 3.5、修改文件时间或创建新文件：touch
+
+我们在ls这个指令的介绍是，有稍微提到每个档案在linux底下都会记录许多的时间参数，其实是有三个主要的变动时间，那这三个时间的意义是什么呢？  
+
+- modification time(mtime): 
+	- 当该档案的【内容资料】变更时，就会更新这个时间！内容资料指的是档案的内容，而不是档案的属性或权限！  
+
+- status time(ctime):  
+	- 当该档案的【状态（status）】改变时，就会更新这个时间，例如，像是权限与属性被更改了，都会更新这个时间啊。  
+
+- access time(atime):  
+	- 当【该档案的内容被取用】时，就会更新这个读取时间（access）。例如，我们使用cat去读取 /etc/man_db.conf，就会更新该档案的atime了。  
+
+```
+[root@study ~]# date; ls -l /etc/man_db.conf ; ls -l --time=atime /etc/man_db.conf ; \
+> ls -l --time=ctime /etc/man_db.conf # 這兩行其實是同一行喔！用分號隔開
+Tue Jun 16 00:43:17 CST 2015  # 目前的時間啊！
+-rw-r--r--. 1 root root 5171 Jun 10  2014 /etc/man_db.conf  # 在 2014/06/10 建立的內容(mtime)
+-rw-r--r--. 1 root root 5171 Jun 15 23:46 /etc/man_db.conf  # 在 2015/06/15 讀取過內容(atime)
+-rw-r--r--. 1 root root 5171 May  4 17:54 /etc/man_db.conf  # 在 2015/05/04 更新過狀態(ctime)
+# 為了要讓資料輸出比較好看，所以鳥哥將三個指令同時依序執行，三個指令中間用分號 (;) 隔開即可。
+```
+
+**在预设的情况下，ls显示出来的是该档案的mtime，也就是这个档案的内容上次被更动的时间。**  
+
+档案的时间是很重要的，因为，如果档案的时间误判的话，可能会曹成某些程序无法的运作。那万一我发现了一个档案来时未来，该如何让该档案的是事假编程【现在】的时刻呢？很简单！就用 【touch】 这个指令即可！  
+
+```
+[root@study ~]# touch [-acdmt] 檔案
+選項與參數：
+-a  ：僅修訂 access time；
+-c  ：僅修改檔案的時間，若該檔案不存在則不建立新檔案；
+-d  ：後面可以接欲修訂的日期而不用目前的日期，也可以使用 --date="日期或時間"
+-m  ：僅修改 mtime ；
+-t  ：後面可以接欲修訂的時間而不用目前的時間，格式為[YYYYMMDDhhmm]
+
+範例一：新建一個空的檔案並觀察時間
+[dmtsai@study ~]# cd /tmp
+[dmtsai@study tmp]# touch testtouch
+[dmtsai@study tmp]# ls -l testtouch
+-rw-rw-r--. 1 dmtsai dmtsai 0 Jun 16 00:45 testtouch
+# 注意到，這個檔案的大小是 0 呢！在預設的狀態下，如果 touch 後面有接檔案，
+# 則該檔案的三個時間 (atime/ctime/mtime) 都會更新為目前的時間。若該檔案不存在，
+# 則會主動的建立一個新的空的檔案喔！例如上面這個例子！
+
+範例二：將 ~/.bashrc 複製成為 bashrc，假設複製完全的屬性，檢查其日期
+[dmtsai@study tmp]# cp -a ~/.bashrc bashrc
+[dmtsai@study tmp]# date; ll bashrc; ll --time=atime bashrc; ll --time=ctime bashrc
+Tue Jun 16 00:49:24 CST 2015                         <==這是目前的時間
+-rw-r--r--. 1 dmtsai dmtsai 231 Mar  6 06:06 bashrc  <==這是 mtime
+-rw-r--r--. 1 dmtsai dmtsai 231 Jun 15 23:44 bashrc  <==這是 atime
+-rw-r--r--. 1 dmtsai dmtsai 231 Jun 16 00:47 bashrc  <==這是 ctime
+```
+
+在上面这个案例中，我们用了【ll】这个指令（两个英文L的小写），这个指令其实就是【ls -l】的意思。  
+ll 本省不存在，是被【做出来】的一个命令别名。相关的命令别名我们会在 bash 章节当中湘潭，这里先知道一下就好。  
+至于【;】则代表连续指令的下达拉！你可以在一个指令当中写入多冲指令，这些指令可以【依序】执行，由上面的指令我们会知道ll那一行有三个指令被下达在同一行。  
+
+至于执行的结果当中，我们可发现资料的内容与属性是被复制过来的，因此档案内容时间（mtime）与原本档案相同。但是由于这个档案是刚刚被建立的，因此状态（ctime）就变成现在的时间了！那如果想要变更整个档案的时间呢？可以直接这样做：  
+
+```
+範例三：修改案例二的 bashrc 檔案，將日期調整為兩天前
+[dmtsai@study tmp]# touch -d "2 days ago" bashrc
+[dmtsai@study tmp]# date; ll bashrc; ll --time=atime bashrc; ll --time=ctime bashrc
+Tue Jun 16 00:51:52 CST 2015
+-rw-r--r--. 1 dmtsai dmtsai 231 Jun 14 00:51 bashrc
+-rw-r--r--. 1 dmtsai dmtsai 231 Jun 14 00:51 bashrc
+-rw-r--r--. 1 dmtsai dmtsai 231 Jun 16 00:51 bashrc
+# 跟上個範例比較看看，本來是 16 日變成 14 日了 (atime/mtime)～不過， ctime 並沒有跟著改變喔！
+
+範例四：將上個範例的 bashrc 日期改為 2014/06/15 2:02
+[dmtsai@study tmp]# touch -t 201406150202 bashrc
+[dmtsai@study tmp]# date; ll bashrc; ll --time=atime bashrc; ll --time=ctime bashrc
+Tue Jun 16 00:54:07 CST 2015
+-rw-r--r--. 1 dmtsai dmtsai 231 Jun 15  2014 bashrc
+-rw-r--r--. 1 dmtsai dmtsai 231 Jun 15  2014 bashrc
+-rw-r--r--. 1 dmtsai dmtsai 231 Jun 16 00:54 bashrc
+# 注意看看，日期在 atime 與 mtime 都改變了，但是 ctime 則是記錄目前的時間！
+```
+
+透过 touch 这个指令，我们可以轻易的修订档案的时间与日期。并且也可以建立一个空的档案。  
+不过要注意的是，即使我们赋值一个档案时，复制所有的属性，但也没有办法复制 ctime 这个属性的。  
+ctime 可以记录这个档案最近的状态（status）被改变的时间。  
+无论如何，我们平时看的档案属性中，比较重要的还是属于哪个 mtime 啊！我们关心的常常是这个档案的【内容】是什么时候被更动的，瞭乎？  
+
+无论如何—— touch 这个指令最常用的情况是：  
+
+- 建立一个空的档案；  
+- 将某个档案日期修改为目前（mtime 与 atime）
+
 
 ## 4、文件与目录的默认权限与隐藏权限
 
