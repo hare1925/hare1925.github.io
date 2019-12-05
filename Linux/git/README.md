@@ -1,5 +1,7 @@
 # git笔记
 
+![git](./git.jpg)
+
 ## git记住密码
 
 ###  git永久记住密码  
